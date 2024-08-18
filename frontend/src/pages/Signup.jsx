@@ -66,7 +66,7 @@ export const Signup = () => {
       axios
         .post("http://localhost:8080/signup", formValues)
         .then(() => {
-          navigate("/")
+          navigate("/login")
         })
         .catch((err) => console.error(err))
     }
@@ -146,7 +146,7 @@ export const Signup = () => {
         </button>
         <p>
           <span className="text-neutral-400">Already have an account ?</span>{" "}
-          <Link to={"/"} className="hover:text-blue-700 transition-all">
+          <Link to={"/login"} className="hover:text-blue-700 transition-all">
             Login
           </Link>
         </p>

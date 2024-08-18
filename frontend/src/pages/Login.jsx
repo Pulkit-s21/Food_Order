@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom"
 import { useState } from "react"
+import Swal from "sweetalert2"
 import axios from "axios"
 
 export const Login = () => {
@@ -46,10 +47,34 @@ export const Login = () => {
       axios
         .post("http://localhost:8080/login", formValues)
         .then((res) => {
-          if (res.data === "Success") {
-            navigate("/")
+          if (res.data.status === "Success") {
+            let timerInterval
+            Swal.fire({
+              html: `
+              <div class="flex flex-col gap-6">
+                <p class="text-4xl">Welcome <span class="font-bold text-blue-500">${res.data.user[0].Username}</span></p>
+                  <p class="text-lg text-neutral-900">Happy <span class="font-bold">Food-ing</span> 🌮 🥗 ☕ </p>
+              </div>
+              `,
+              timer: 1500,
+              didOpen: () => {
+                Swal.showLoading()
+                timerInterval = setInterval(() => {}, 500)
+              },
+              willClose: () => {
+                clearInterval(timerInterval)
+              },
+            }).then((result) => {
+              if (result.dismiss === Swal.DismissReason.timer) {
+                navigate("/")
+              }
+            })
           } else {
-            alert("No record found of this user")
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: res.data.message || "No record found of this user",
+            })
           }
         })
         .catch((err) => console.error(err))
