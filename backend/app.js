@@ -7,12 +7,12 @@ dotenv.config()
 const app = express()
 const PORT = process.env.PORT || 8080
 
-const corsOptions = {
-  origin: "http://localhost:5173",
-  optionsSuccessStatus: 200,
-}
+app.use(
+  cors({
+    origin: "*",
+  })
+)
 
-app.use(cors())
 app.use(express.json())
 
 // ? get all users

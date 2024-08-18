@@ -31,25 +31,27 @@ export const getUser = async (id) => {
 }
 
 // * login user
-export const loginUser = async (req, res, email, password) => {
-  const [user] = await pool.query(
-    `
-  SELECT *
-  FROM users
-  WHERE Email = ? 
-  AND Password = ?   
-  `,
-    [email, password],
-    (err, data) => {
-      if (err) res.json("Error")
-      if (data.length > 0) {
-        return res.json("Success")
-      } else {
-        return res.json("Failed")
-      }
+export const loginUser = async (email, password) => {
+  try {
+    const [user] = await pool.query(
+      `
+      SELECT *
+      FROM users
+      WHERE Email = ? 
+      AND Password = ?
+      `,
+      [email, password]
+    )
+
+    if (user) {
+      return { status: "Success", user }
+    } else {
+      return { status: "Failed" }
     }
-  )
-  return user
+  } catch (err) {
+    console.error(err)
+    return { status: "Error" }
+  }
 }
 
 // * signup new user
