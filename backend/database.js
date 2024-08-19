@@ -1,6 +1,9 @@
 import mysql from "mysql2"
 import dotenv from "dotenv"
+import bcrypt from "bcrypt"
 dotenv.config()
+
+const saltRounds = 10 // saltRounds is the num of calculations required for hashing the password
 
 const pool = mysql
   .createPool({
@@ -38,13 +41,17 @@ export const loginUser = async (email, password) => {
       SELECT *
       FROM users
       WHERE Email = ? 
-      AND Password = ?
       `,
-      [email, password]
+      [email]
     )
 
     if (user) {
-      return { status: "Success", user }
+      const isMatch = bcrypt.compare(password, user[0].Password)
+      if (isMatch) {
+        return { status: "Success", user }
+      } else {
+        return "Password didn't match"
+      }
     } else {
       return { status: "Failed" }
     }
@@ -56,12 +63,17 @@ export const loginUser = async (email, password) => {
 
 // * signup new user
 export const createUser = async (username, email, password) => {
-  const newUser = await pool.query(
-    `
-    INSERT INTO users (Username,Email,Password)
-    VALUES (?,?,?)
-    `,
-    [username, email, password]
-  )
-  return newUser
+  bcrypt.hash(password[0], saltRounds, async (err, hashedPassword) => {
+    if (err) {
+      res.status(404).send("Couldn't hash the password")
+    } else {
+      const newUser = await pool.query(
+        `
+        INSERT INTO users (Username,Email,Password)
+        VALUES (?,?,?)
+        `,
+        [username, email, hashedPassword]
+      )
+    }
+  })
 }

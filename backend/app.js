@@ -36,9 +36,9 @@ app.post("/login", async (req, res) => {
 })
 
 // ? create new User
-app.post("/signup", async (req, res) => {
+app.post("/signup", (req, res) => {
   const { username, email, password } = req.body
-  const signup = await createUser(username, email, password)
+  const signup = createUser(username, email, password)
   res.status(201).send(signup)
 })
 
